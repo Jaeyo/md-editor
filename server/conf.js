@@ -17,5 +17,9 @@ module.exports = {
 			maxsize: 5242880,
 			maxFiles: 5
 		}
+	},
+	dropbox: {
+		key: '',
+		secret: ''
 	}
 }
