@@ -4,7 +4,9 @@ import QS from 'query-string'
 import request from 'superagent'
 import util from './utils/util.js'
 import server from './utils/server.js'
+
 import Editor from './editor.jsx'
+import DropboxPage from './dropbox.jsx'
 
 util.init()
 
@@ -14,7 +16,8 @@ function getDOM() {
 
 	try {
 		if(pathname === '/') {
-			return (<Editor />)
+			// return (<Editor />)
+			return (<DropboxPage />)
 		}
 	} catch(err) {
 		console.error(err)
