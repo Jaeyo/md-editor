@@ -1,0 +1,23 @@
+{
+  "name": "node-react-boilerplate",
+  "version": "0.0.0",
+  "authors": [
+    "leejy <lastiverse@gmail.com>"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "directory": "./server/static/lib",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "jquery": "~2.2.0"
+  }
+}
