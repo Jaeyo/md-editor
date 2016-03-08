@@ -1,18 +1,50 @@
 import React from 'react'
 import uuid from 'uuid'
 import marked from 'marked'
+import util from 'util'
 import {
 	Button
 } from 'react-bootstrap'
+import conf from './utils/conf.js'
 import PromptDialog from './comps/prompt-dialog.jsx'
+import AlertDialog from './comps/alert-dialog.jsx'
 
 var Editor = React.createClass({
+	dropbox: null,
+
 	getInitialState() {
-		return { text: '' }
+		return { 
+			text: '',
+			username: '',
+			filename: ''
+		}
 	},
 
 	componentDidMount() {
 		vim.open({ debug: false })
+		this.initDropboxClient()
+	},
+
+	initDropboxClient() {
+		var { refs } = this
+
+		this.dropbox = new Dropbox.Client({ key: conf.dropbox.key })
+		this.dropbox.authenticate((err, dropbox) => {
+			if(err) {
+				if(typeof err !== 'string') err = JSON.stringify(err)
+				refs.alert.show('ERR', err)
+				return
+			}
+
+			dropbox.getAccountInfo((err, accountInfo) => {
+				if(err) {
+					if(typeof err !== 'string') err = JSON.stringify(err)
+					refs.alert.show('ERR', err)
+					return
+				}
+				this.setState({ username: util.format('%s(%s)', accountInfo.name, accountInfo.email) })
+			})
+		})
 	},
 
 	onTextChange(evt) {
@@ -23,8 +55,12 @@ var Editor = React.createClass({
 	onNewDocBtnClick(evt) {
 		evt.stopPropagation()
 		var { refs } = this
+
 		refs.prompt.show('new document name', 'new document name:', (docName) => {
-			alert(docName)
+			var filename = docName + '.md'
+			this.dropbox.writeFile(filename, '', (err, stat) => {
+				this.setState({ filename: filename })
+			})
 		})
 	},
 
@@ -35,15 +71,18 @@ var Editor = React.createClass({
 			return (
 				<EntireDiv>
 					<VerticalDiv width="10%">
+						<div style={{ padding: '10px' }}>{state.username}</div>
 						<Button onClick={this.onNewDocBtnClick} style={{ width: '100%' }}>new document</Button>
 					</VerticalDiv>
 					<VerticalDiv width="45%">
+						<div>{state.filename}</div>
 						<Text onChange={this.onTextChange} />
 					</VerticalDiv>
 					<VerticalDiv width="45%">
 						<div dangerouslySetInnerHTML={{ __html: marked(state.text) }} />
 					</VerticalDiv>
 					<PromptDialog ref="prompt" />
+					<AlertDialog ref="alert" />
 				</EntireDiv>
 			)
 		} catch(err) {
