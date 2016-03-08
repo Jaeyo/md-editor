@@ -16,7 +16,9 @@ var MarkdownBlock = React.createClass({
 
 			return (
 				<VerticalDiv width="45%">
-					<div dangerouslySetInnerHTML={{ __html: marked(props.text) }} />
+					<div 
+						style={{ height: '100%', overflow: 'auto' }}
+						dangerouslySetInnerHTML={{ __html: marked(props.text) }} />
 				</VerticalDiv>
 			)
 		} catch(err) {

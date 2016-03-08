@@ -1,16 +1,11 @@
 import React from 'react'
-import uuid from 'uuid'
 import util from 'util'
-import {
-	Button
-} from 'react-bootstrap'
 import MenuNav from './editor/menu-nav.jsx'
 import EditorBlock from './editor/editor-block.jsx'
 import MarkdownBlock from './editor/markdown-block.jsx'
 import conf from './utils/conf.js'
 import AlertDialog from './comps/alert-dialog.jsx'
 import {
-	VerticalDiv,
 	EntireDiv
 } from './comps/div-layout'
 
@@ -79,6 +74,7 @@ var Editor = React.createClass({
 				refs.alert.show('ERR', err)
 				return
 			}
+			this.loadFileList()
 			this.loadFile(filename)
 		})
 	},
@@ -98,6 +94,33 @@ var Editor = React.createClass({
 		})
 	},
 
+	saveCurrentFile() {
+		var { state, refs } = this
+		this.dropbox.writeFile(state.currentFilename, state.text, (err, stat) => {
+			if(err) {
+				if(typeof err !== 'string') err = JSON.stringify(err)
+				refs.alert.show('ERR', err)
+				return
+			}
+			refs.alert.show('saved', 'saved')
+			this.loadFileList()
+		})
+	},
+
+	deleteCurrentFile() {
+		var { state, refs } = this
+		this.dropbox.remove(state.currentFilename, (err, stat) => {
+			if(err) {
+				if(typeof err !== 'string') err = JSON.stringify(err)
+				refs.alert.show('ERR', err)
+				return
+			}		
+			refs.alert.show('deleted', 'deleted')
+			this.loadFileList()
+			this.setState({ text: '', currentFilename: '' })
+		})
+	},
+
 	render() {
 		try {
 			var { state } = this
@@ -112,7 +135,9 @@ var Editor = React.createClass({
 					<EditorBlock 
 						currentFilename={state.currentFilename}
 						text={state.text}
-						onTextChange={this.onTextChange} />
+						onTextChange={this.onTextChange}
+						onDocSave={this.saveCurrentFile}
+						onDocDelete={this.deleteCurrentFile} />
 					<MarkdownBlock text={state.text} />
 					<AlertDialog ref="alert" />
 				</EntireDiv>
