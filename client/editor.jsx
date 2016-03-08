@@ -1,28 +1,36 @@
 import React from 'react'
 import uuid from 'uuid'
-import marked from 'marked'
 import util from 'util'
 import {
 	Button
 } from 'react-bootstrap'
+import MenuNav from './editor/menu-nav.jsx'
+import EditorBlock from './editor/editor-block.jsx'
+import MarkdownBlock from './editor/markdown-block.jsx'
 import conf from './utils/conf.js'
-import PromptDialog from './comps/prompt-dialog.jsx'
 import AlertDialog from './comps/alert-dialog.jsx'
+import {
+	VerticalDiv,
+	EntireDiv
+} from './comps/div-layout'
+
 
 var Editor = React.createClass({
 	dropbox: null,
 
 	getInitialState() {
 		return { 
-			text: '',
 			username: '',
-			filename: ''
+			text: '',
+			currentFilename: '',
+			fileList: []
 		}
 	},
 
 	componentDidMount() {
 		vim.open({ debug: false })
 		this.initDropboxClient()
+		this.loadFileList()
 	},
 
 	initDropboxClient() {
@@ -47,19 +55,45 @@ var Editor = React.createClass({
 		})
 	},
 
-	onTextChange(evt) {
-		evt.stopPropagation()
-		this.setState({ text: evt.target.value })
+	loadFileList() {
+		this.dropbox.readdir('/', (err, entries) => {
+			if(err) {
+				if(typeof err !== 'string') err = JSON.stringify(err)
+				refs.alert.show('ERR', err)
+				return
+			}
+
+			this.setState({ fileList: entries })
+		})
 	},
 
-	onNewDocBtnClick(evt) {
-		evt.stopPropagation()
-		var { refs } = this
+	onTextChange(text) {
+		this.setState({ text: text })
+	},
 
-		refs.prompt.show('new document name', 'new document name:', (docName) => {
-			var filename = docName + '.md'
-			this.dropbox.writeFile(filename, '', (err, stat) => {
-				this.setState({ filename: filename })
+	onNewFile(filename) {
+		var { ref } = this
+		this.dropbox.writeFile(filename, '', (err, stat) => {
+			if(err) {
+				if(typeof err !== 'string') err = JSON.stringify(err)
+				refs.alert.show('ERR', err)
+				return
+			}
+			this.loadFile(filename)
+		})
+	},
+
+	loadFile(filename) {
+		this.dropbox.readFile(filename, (err, data) => {
+			if(err) {
+				if(typeof err !== 'string') err = JSON.stringify(err)
+				refs.alert.show('ERR', err)
+				return
+			}
+
+			this.setState({
+				currentFilename: filename,
+				text: data
 			})
 		})
 	},
@@ -70,18 +104,16 @@ var Editor = React.createClass({
 
 			return (
 				<EntireDiv>
-					<VerticalDiv width="10%">
-						<div style={{ padding: '10px' }}>{state.username}</div>
-						<Button onClick={this.onNewDocBtnClick} style={{ width: '100%' }}>new document</Button>
-					</VerticalDiv>
-					<VerticalDiv width="45%">
-						<div>{state.filename}</div>
-						<Text onChange={this.onTextChange} />
-					</VerticalDiv>
-					<VerticalDiv width="45%">
-						<div dangerouslySetInnerHTML={{ __html: marked(state.text) }} />
-					</VerticalDiv>
-					<PromptDialog ref="prompt" />
+					<MenuNav 
+						username={state.username}
+						fileList={state.fileList}
+						onNewFile={this.onNewFile}
+						onLoadFile={this.loadFile} />
+					<EditorBlock 
+						currentFilename={state.currentFilename}
+						text={state.text}
+						onTextChange={this.onTextChange} />
+					<MarkdownBlock text={state.text} />
 					<AlertDialog ref="alert" />
 				</EntireDiv>
 			)
@@ -93,30 +125,3 @@ var Editor = React.createClass({
 module.exports = Editor
 
 
-var EntireDiv = (props) => {
-	return (
-		<div style={{ height: '100%', width: '100%' }}>{ props.children }</div>
-	)
-}
-
-//props: width
-var VerticalDiv = (props) => {
-	return (
-		<div style={{ float: 'left', width: props.width, height: '100%', position: 'relative' }}>{ props.children }</div>
-	)
-}
-
-//props: onChange
-var Text = (props) => {
-	return (
-		<textarea 
-			style={{ 
-				position: 'absolute', 
-				width: '100%', 
-				height: '100%', 
-				top: 0, left: 0, right: 0, bottom: 0 
-			}} 
-			onChange={props.onChange}>
-		</textarea>
-	)
-}
