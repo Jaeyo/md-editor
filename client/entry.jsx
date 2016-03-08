@@ -16,8 +16,8 @@ function getDOM() {
 
 	try {
 		if(pathname === '/') {
-			// return (<Editor />)
-			return (<DropboxPage />)
+			// return (<DropboxPage />)
+			return (<Editor />)
 		}
 	} catch(err) {
 		console.error(err)

@@ -1,6 +1,10 @@
 import React from 'react'
 import uuid from 'uuid'
 import marked from 'marked'
+import {
+	Button
+} from 'react-bootstrap'
+import PromptDialog from './comps/prompt-dialog.jsx'
 
 var Editor = React.createClass({
 	getInitialState() {
@@ -16,9 +20,12 @@ var Editor = React.createClass({
 		this.setState({ text: evt.target.value })
 	},
 
-	onNewFileBtnClick(evt) {
+	onNewDocBtnClick(evt) {
 		evt.stopPropagation()
-		//TODO
+		var { refs } = this
+		refs.prompt.show('new document name', 'new document name:', (docName) => {
+			alert(docName)
+		})
 	},
 
 	render() {
@@ -28,6 +35,7 @@ var Editor = React.createClass({
 			return (
 				<EntireDiv>
 					<VerticalDiv width="10%">
+						<Button onClick={this.onNewDocBtnClick} style={{ width: '100%' }}>new document</Button>
 					</VerticalDiv>
 					<VerticalDiv width="45%">
 						<Text onChange={this.onTextChange} />
@@ -35,6 +43,7 @@ var Editor = React.createClass({
 					<VerticalDiv width="45%">
 						<div dangerouslySetInnerHTML={{ __html: marked(state.text) }} />
 					</VerticalDiv>
+					<PromptDialog ref="prompt" />
 				</EntireDiv>
 			)
 		} catch(err) {
