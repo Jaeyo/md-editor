@@ -16,16 +16,23 @@ var Editor = React.createClass({
 		this.setState({ text: evt.target.value })
 	},
 
+	onNewFileBtnClick(evt) {
+		evt.stopPropagation()
+		//TODO
+	},
+
 	render() {
 		try {
 			var { state } = this
 
 			return (
 				<EntireDiv>
-					<VerticalDiv>
+					<VerticalDiv width="10%">
+					</VerticalDiv>
+					<VerticalDiv width="45%">
 						<Text onChange={this.onTextChange} />
 					</VerticalDiv>
-					<VerticalDiv>
+					<VerticalDiv width="45%">
 						<div dangerouslySetInnerHTML={{ __html: marked(state.text) }} />
 					</VerticalDiv>
 				</EntireDiv>
@@ -44,9 +51,10 @@ var EntireDiv = (props) => {
 	)
 }
 
+//props: width
 var VerticalDiv = (props) => {
 	return (
-		<div style={{ float: 'left', width: '50%', height: '100%', position: 'relative' }}>{ props.children }</div>
+		<div style={{ float: 'left', width: props.width, height: '100%', position: 'relative' }}>{ props.children }</div>
 	)
 }
 
