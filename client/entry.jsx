@@ -8,6 +8,8 @@ import server from './utils/server.js'
 import Editor from './editor.jsx'
 import DropboxPage from './dropbox.jsx'
 
+import CodeMirror from 'react-codemirror'
+
 util.init()
 
 function getDOM() {
@@ -16,7 +18,6 @@ function getDOM() {
 
 	try {
 		if(pathname === '/') {
-			// return (<DropboxPage />)
 			return (<Editor />)
 		}
 	} catch(err) {

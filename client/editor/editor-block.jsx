@@ -1,4 +1,5 @@
 import React from 'react'
+import CodeMirror from 'react-codemirror'
 import { Button } from 'react-bootstrap'
 import { VerticalDiv } from '../comps/div-layout.jsx'
 import ConfirmDialog from '../comps/confirm-dialog.jsx'
@@ -13,10 +14,9 @@ var EditorBlock = React.createClass({
 		onDocDelete: React.PropTypes.func.isRequired
 	},
 
-	onTextChange(evt) {
-		evt.stopPropagation()
+	onTextChange(value) {
 		var { props } = this
-		props.onTextChange(evt.target.value)
+		props.onTextChange(value)
 	},
 
 	onDeleteBtnClick(evt) {
@@ -48,7 +48,7 @@ var EditorBlock = React.createClass({
 							delete
 						</Button>
 					</div>
-					<Text onChange={this.onTextChange} text={props.text} />
+					<CodeMirrorText onChange={this.onTextChange} text={props.text} />
 					<ConfirmDialog ref="confirm" />
 				</VerticalDiv>
 			)
@@ -71,5 +71,15 @@ var Text = (props) => {
 			onChange={props.onChange}
 			value={props.text}>
 		</textarea>
+	)
+}
+
+//props: onChange, text
+var CodeMirrorText = (props) => {
+	return (
+		<CodeMirror
+			value={props.text}
+			onChange={props.onChange}
+			options={{ lineNumbers: true }} />
 	)
 }
