@@ -1,5 +1,6 @@
 import React from 'react'
 import CodeMirror from 'react-codemirror'
+import 'codemirror/mode/markdown/markdown'
 import { Button } from 'react-bootstrap'
 import { VerticalDiv } from '../comps/div-layout.jsx'
 import ConfirmDialog from '../comps/confirm-dialog.jsx'
@@ -80,6 +81,9 @@ var CodeMirrorText = (props) => {
 		<CodeMirror
 			value={props.text}
 			onChange={props.onChange}
-			options={{ lineNumbers: true }} />
+			options={{ 
+				lineNumbers: true,
+				mode: 'markdown'
+			}} />
 	)
 }
