@@ -5,3 +5,4 @@ dist
 *.log
 bundle.js
 server/static/lib/*
+client/utils/conf.js
